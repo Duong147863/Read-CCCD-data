@@ -307,7 +307,7 @@ app = Flask(__name__)
 # Cấu hình thư mục lưu ảnh
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
+LARAVEL_API_URL = "http://192.168.1.33:8000/api/upload_cccd" 
 # Đường dẫn Tesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\duong\Downloads\Tesseract-OCR\Tesseract-OCR\tesseract.exe'
 

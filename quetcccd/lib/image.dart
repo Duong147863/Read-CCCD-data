@@ -21,7 +21,7 @@ class _GridListDemoState extends State<GridListDemo> {
   Future<void> _uploadImage(File image) async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://10.3.251.68:5000/extract_text'),
+      Uri.parse('http://192.168.1.33:8000/api/upload_cccd'),
     );
 
     request.files.add(await http.MultipartFile.fromPath('image', image.path));

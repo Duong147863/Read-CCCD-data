@@ -33,49 +33,77 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+// Future<void> _sendToServer(File imageFile) async {
+//   try {
+//     var client = http.Client();
+//     var request = http.MultipartRequest(
+//       'POST',
+//       Uri.parse("http://10.3.251.68:5000/extract_text"),
+//     );
+
+//     request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+//     var response = await client.send(request).timeout(Duration(seconds: 60));
+
+//     if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted, không tiếp tục
+
+//     if (response.statusCode == 200) {
+//       String responseBody = await response.stream.bytesToString();
+//       Map<String, dynamic> extractedData = json.decode(responseBody);
+//       print("Dữ liệu trích xuất: $extractedData");
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Ảnh đã gửi thành công!"))
+//       );
+//     } else {
+//       print("Lỗi khi gửi ảnh lên server! Mã lỗi: ${response.statusCode}");
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Lỗi gửi ảnh!"))
+//       );
+//     }
+//   } on TimeoutException catch (_) {
+//     print("Lỗi: Quá thời gian chờ");
+
+//     if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Lỗi: Quá thời gian chờ"))
+//     );
+//   } catch (e) {
+//     print("Lỗi khi gửi ảnh: $e");
+
+//     if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Lỗi gửi ảnh!"))
+//     );
+//   }
+// }
 Future<void> _sendToServer(File imageFile) async {
   try {
-    var client = http.Client();
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://10.3.251.68:5000/extract_text"),
+      Uri.parse("http://192.168.1.33:8000/api/upload_cccd") // Laravel API mới
     );
 
     request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
 
-    var response = await client.send(request).timeout(Duration(seconds: 60));
-
-    if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted, không tiếp tục
+    var response = await request.send();
 
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
-      Map<String, dynamic> extractedData = json.decode(responseBody);
-      print("Dữ liệu trích xuất: $extractedData");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ảnh đã gửi thành công!"))
-      );
+      Map<String, dynamic> responseData = json.decode(responseBody);
+      
+      if (responseData.containsKey('image_url')) {
+        String imageUrl = responseData['image_url'];
+        print("Ảnh đã lưu trên Laravel: $imageUrl");
+      } else {
+        print("Lỗi: Không nhận được đường dẫn ảnh từ Laravel!");
+      }
     } else {
-      print("Lỗi khi gửi ảnh lên server! Mã lỗi: ${response.statusCode}");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi gửi ảnh!"))
-      );
+      print("Lỗi gửi ảnh lên Laravel: ${response.statusCode}");
     }
-  } on TimeoutException catch (_) {
-    print("Lỗi: Quá thời gian chờ");
-
-    if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Lỗi: Quá thời gian chờ"))
-    );
   } catch (e) {
-    print("Lỗi khi gửi ảnh: $e");
-
-    if (!mounted) return; // Kiểm tra nếu widget đã bị unmounted
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Lỗi gửi ảnh!"))
-    );
+    print("Lỗi khi gửi ảnh lên Laravel: $e");
   }
 }
 
